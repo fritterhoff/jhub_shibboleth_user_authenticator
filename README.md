@@ -1,0 +1,2 @@
+# jhub_shibboleth_user_authenticator
+Shibboleth User Authenticator for JupyterHUB
