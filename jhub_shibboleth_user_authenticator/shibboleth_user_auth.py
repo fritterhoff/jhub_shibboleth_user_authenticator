@@ -6,6 +6,8 @@ from jupyterhub.auth import LocalAuthenticator
 from jupyterhub.utils import url_path_join
 from tornado import gen, web
 from traitlets import Unicode
+from tornado.httputil import url_concat
+from tornado.escape import url_escape
 
 
 
@@ -31,6 +33,7 @@ class ShibbolethUserLoginHandler(BaseHandler):
 
         html = self.render_template(
             'welcome.html',
+            sync=True,
             next=url_escape(self.get_argument('next', default='')),
             custom_html=self.authenticator.custom_html,
             login_url=self.settings['login_url'],
@@ -38,10 +41,11 @@ class ShibbolethUserLoginHandler(BaseHandler):
             authenticator_login_url=url_concat(
                 self.authenticator.login_url(self.hub.base_url),
                 {'target': self.get_argument('next', '')},
-            ),
+            )
         )
 
         self.finish(html)
+
 
 
 
@@ -61,10 +65,10 @@ class ShibbolethUserAuthenticator(Authenticator):
         ]
 
     def login_url(self, base_url):
-        return self.domain + '/Shibboleth.sso/Login
+        return '/Shibboleth.sso/Login'
 
     def logout_url(self, base_url):
-        return self.domain + '/Shibboleth.sso/Logout?return=/'
+        return '/Shibboleth.sso/Logout?return=/'
 
 
     @gen.coroutine
