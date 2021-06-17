@@ -1,97 +1,103 @@
-
-import os
 from jupyterhub.handlers import BaseHandler
+from jupyterhub.handlers.login import LogoutHandler
 from jupyterhub.auth import Authenticator
-from jupyterhub.auth import LocalAuthenticator
-from jupyterhub.utils import url_path_join
-from tornado import gen, web
-from traitlets import Unicode
 from tornado.httputil import url_concat
-from tornado.escape import url_escape
-
+from traitlets import Unicode, List
 
 
 class ShibbolethUserLoginHandler(BaseHandler):
 
-    def get(self):
+    async def get(self):
         header_name = self.authenticator.header_name
-        remote_user = self.request.headers.get(header_name, "")
+        remote_user = self.request.headers.get(header_name, '')
 
-        if remote_user == "":
+        if remote_user == '':
             self.welcome_page()
         else:
-            user = self.user_from_username(remote_user)
-            self.set_login_cookie(user)
+            user = await self.login_user({
+                'username': remote_user
+            })
 
             next_url = self.get_next_url(user)
             self.redirect(next_url)
 
-            self.statsd.incr('login.request')
-
     def welcome_page(self):
         """Present welcome page with login button"""
+
+        next_url = self.get_argument('next', default='')
+
+        if next_url != '':
+            target_args = {
+                'next': next_url
+            }
+        else:
+            target_args = {}
 
         html = self.render_template(
             'welcome.html',
             sync=True,
-            next=url_escape(self.get_argument('next', default='')),
-            custom_html=self.authenticator.custom_html,
-            login_url=self.settings['login_url'],
-            login_service='Shibboleth',
+            login_service=self.authenticator.login_service,
             authenticator_login_url=url_concat(
-                self.authenticator.login_url(self.hub.base_url),
-                {'target': self.get_argument('next', '')},
-            )
+                self.authenticator.login_page,
+                {
+                    'target': url_concat(
+                        '/hub/login',
+                        target_args
+                    )
+                }
+            ),
         )
 
         self.finish(html)
 
 
+class ShibbolethUserLogoutHandler(LogoutHandler):
 
+    """Redirect to Shibboleth logout."""
+    #async def handle_logout(self):
+    async def render_logout_page(self):
+        self.redirect(self.authenticator.logout_page)
 
 
 class ShibbolethUserAuthenticator(Authenticator):
-    """
-    Accept the authenticated user name from the REMOTE_USER HTTP header.
-    """
+    """ Accept the authenticated user name from the REMOTE_USER HTTP header."""
+
     header_name = Unicode(
         default_value='REMOTE_USER',
         config=True,
-        help="""HTTP header to inspect for the authenticated username.""")
+        help='HTTP header to inspect for the authenticated username.')
+
+    auth_state_header_names = List(Unicode,
+                                   config=True,
+                                   default_value=[],
+                                   help='List of headers which should be stored as auth_state.')
+
+    login_page = Unicode(
+        default_value='/Shibboleth.sso/Login',
+        config=True,
+        help='Location of login page'
+    )
+
+    logout_page = Unicode(
+        default_value='/Shibboleth.sso/Logout?return=/',
+        config=True,
+        help='Location of logout page'
+    )
+
+    login_service = Unicode(
+        default_value='Shibboleth',
+        config=True,
+        help='Name of the login service'
+    )
 
     def get_handlers(self, app):
         return [
             (r'/login', ShibbolethUserLoginHandler),
+            (r'/logout', ShibbolethUserLogoutHandler),
         ]
 
-    def login_url(self, base_url):
-        return '/Shibboleth.sso/Login'
+    async def authenticate(self, handler, data):
+        return {
+            'name': data.get('username')
+        }
 
-    def logout_url(self, base_url):
-        return '/Shibboleth.sso/Logout?return=/'
-
-
-    @gen.coroutine
-    def authenticate(self, *args):
-        raise NotImplementedError()
-
-
-class ShibbolethUserLocalAuthenticator(LocalAuthenticator):
-    """
-    Accept the authenticated user name from the REMOTE_USER HTTP header.
-    Derived from LocalAuthenticator for use of features such as adding
-    local accounts through the admin interface.
-    """
-    header_name = Unicode(
-        default_value='REMOTE_USER',
-        config=True,
-        help="""HTTP header to inspect for the authenticated username.""")
-
-    def get_handlers(self, app):
-        return [
-            (r'/login', ShibbolethUserLoginHandler),
-        ]
-
-    @gen.coroutine
-    def authenticate(self, *args):
-        raise NotImplementedError()
