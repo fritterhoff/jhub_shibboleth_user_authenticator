@@ -11,6 +11,8 @@ class ShibbolethUserLoginHandler(BaseHandler):
         header_name = self.authenticator.header_name
         remote_user = self.request.headers.get(header_name, '')
 
+        self.log.info("Shibboleth header_name=%s", header_name)
+        self.log.info("Shibboleth remote_user=%s", remote_user)
         if remote_user == '':
             self.welcome_page()
         else:
