@@ -21,12 +21,12 @@ be used in jupyterhub.
 
 This package can be installed with `pip` either from a local git repository or from PyPi.
 
-Installation from local git repository::
+Installation from local git repository:
 
     cd jhub_shibboleth_user_authenticator
     pip install .
 
-Installation from PyPi::
+Installation from PyPi:
 
     pip install jhub_shibboelth_user_authenticator
 
@@ -37,14 +37,13 @@ Alternately, you can add the local project folder must be on your PYTHONPATH.
 
 Usage with a simple jupyterhub configuration:
 
-'''
-# use the shibboleth authentidcator
-c.JupyterHub.authenticator_class = 'jhub_shibboleth_user_authenticator.shibboleth_user_auth.ShibbolethUserAuthenticator
 
-# use a different cookie entry as the user name , remote_user is the default!
-c.Authenticator.header_name = 'uid'
+    # use the shibboleth authentidcator
+    c.JupyterHub.authenticator_class = 'jhub_shibboleth_user_authenticator.shibboleth_user_auth.ShibbolethUserAuthenticator
 
-# put some extra values in the auth_state for the spawner
-# don't forget to activate c.Authenticator.enable_auth_state = True
-c.Authenticator.auth_state_header_names = ['mail', 'givenname']
-'''
+    # use a different cookie entry as the user name , remote_user is the default!
+    c.Authenticator.header_name = 'uid'
+
+    # put some extra values in the auth_state for the spawner
+    # don't forget to activate c.Authenticator.enable_auth_state = True
+    c.Authenticator.auth_state_header_names = ['mail', 'givenname']
