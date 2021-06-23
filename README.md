@@ -6,7 +6,7 @@ This is an implementation of a Shibboleth User Authenticator. The authenticator 
 special proxy (e.g. nginx) which implements the shibboleth authorisation as a service provider,
 serving the /Shibboleth.sso/* commands and pass all other addresses to the jupyterhub proxy.
 
-![alt text](https://github.com/ocordes/jhub_shibboleth_user_authenticator/raw/main/demo-small.png "Demo Login)
+![alt text](https://github.com/ocordes/jhub_shibboleth_user_authenticator/raw/main/demo.png "Demo Login")
 
 This package is the extracting the data from the shibboleth authorisation process and is 
 performing the login process in the jupyterhub. 
