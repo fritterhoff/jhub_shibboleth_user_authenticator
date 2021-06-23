@@ -14,19 +14,22 @@ import os
 import sys
 
 from setuptools import setup
+from pathlib import Path
 
 pjoin = os.path.join
-here = os.path.abspath(os.path.dirname(__file__))
+
+HERE = Path(__file__).parent.resolve()
+
 
 # directory for the templates ...
-share_jupyterhub = pjoin(here, 'share', 'jupyterhub')
+share_jupyterhub = HERE / 'share' /  'jupyterhub'
 
 
 def get_data_files():
     """Get data files in share/jupyter"""
 
     data_files = []
-    ntrim = len(here + os.path.sep)
+    ntrim = len(str(HERE / os.path.sep))
 
     for (d, dirs, filenames) in os.walk(share_jupyterhub):
         data_files.append((d[ntrim:], [pjoin(d, f) for f in filenames]))
@@ -36,15 +39,18 @@ def get_data_files():
 
 # Get the current package version.
 version_ns = {}
-with open(pjoin(here, 'version.py')) as f:
+with open(HERE / 'version.py') as f:
     exec(f.read(), {}, version_ns)
+
+long_description = (HERE / "README.md").read_text()
 
 setup_args = dict(
     name                = 'jhub_shibboleth_user_authenticator',
     packages            = ['jhub_shibboleth_user_authenticator'],
     version             = version_ns['__version__'],
     description         = """REMOTE_USER Authenticator (Shibboleth variant): An Authenticator for Jupyterhub to read user information from HTTP request headers, as when running behind an authenticating proxy.""",
-    long_description    = "",
+    long_description    = long_description,
+    long_description_content_type="text/markdown",
     author              = "Oliver Cordes (https://github.com/ocordes)",
     author_email        = "ocordes@astro.uni-bonn.de",
     url                 = "https://github.com/ocordes/jhub_shibboleth_user_authenticator",
@@ -59,7 +65,6 @@ setup_args = dict(
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
     ],
-    #data_files          = [('.', ['version.py'])],
     data_files          = get_data_files()
 )
 
