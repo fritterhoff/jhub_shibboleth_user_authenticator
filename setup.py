@@ -14,22 +14,21 @@ import os
 import sys
 
 from setuptools import setup
-from pathlib import Path
 
 pjoin = os.path.join
+here = os.path.abspath(os.path.dirname(__file__))
 
-HERE = Path(__file__).parent.resolve()
 
 
 # directory for the templates ...
-share_jupyterhub = HERE / 'share' /  'jupyterhub'
+share_jupyterhub = pjoin(here, 'share', 'jupyterhub')
 
 
 def get_data_files():
     """Get data files in share/jupyter"""
 
     data_files = []
-    ntrim = len(str(HERE / os.path.sep))
+    ntrim = len(str(here + os.path.sep))
 
     for (d, dirs, filenames) in os.walk(share_jupyterhub):
         data_files.append((d[ntrim:], [pjoin(d, f) for f in filenames]))
@@ -39,10 +38,12 @@ def get_data_files():
 
 # Get the current package version.
 version_ns = {}
-with open(HERE / 'version.py') as f:
+with open(pjoin(here, 'version.py')) as f:
     exec(f.read(), {}, version_ns)
 
-long_description = (HERE / "README.md").read_text()
+with open(pjoin(here, "README.md")) as f:
+    long_description = f.read()
+    
 
 setup_args = dict(
     name                = 'jhub_shibboleth_user_authenticator',
