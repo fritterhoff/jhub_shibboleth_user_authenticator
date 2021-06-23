@@ -11,19 +11,20 @@ class ShibbolethUserLoginHandler(BaseHandler):
         header_name = self.authenticator.header_name
         remote_user = self.request.headers.get(header_name, '')
 
-        self.log.info("Shibboleth header_name=%s", header_name)
-        self.log.info("Shibboleth remote_user=%s", remote_user)
+        self.log.info("Shibboleth remote_user(%s)=%s", header_name, remote_user)
         if remote_user == '':
-            self.welcome_page()
+            self.login_page()
         else:
             user = await self.login_user({
-                'username': remote_user
+                'username': remote_user,
+                'headers': self.request.headers
             })
 
             next_url = self.get_next_url(user)
             self.redirect(next_url)
 
-    def welcome_page(self):
+
+    def login_page(self):
         """Present welcome page with login button"""
 
         next_url = self.get_argument('next', default='')
@@ -36,7 +37,7 @@ class ShibbolethUserLoginHandler(BaseHandler):
             target_args = {}
 
         html = self.render_template(
-            'welcome.html',
+            'login_shibboleth.html',
             sync=True,
             login_service=self.authenticator.login_service,
             authenticator_login_url=url_concat(
@@ -99,7 +100,16 @@ class ShibbolethUserAuthenticator(Authenticator):
         ]
 
     async def authenticate(self, handler, data):
+        """ authenticate extracts the data useful for the session
+
+        data includes also the shibboleth response header with some additionals keys to extract and
+        store in auth_state
+        """
+        headers = data.get('headers')
+        auth_state_data = {key: headers.get(key) for key in self.auth_state_header_names}
+
         return {
-            'name': data.get('username')
+            'name': data.get('username'),
+            'auth_state': auth_state_data
         }
 

@@ -4,13 +4,6 @@
 {% endblock %}
 
 {% block main %}
-<div class="container text-center announcement header">
-	<h2>Welcome to JupyterHUB!</h2>
-	<p>
-		<a class="login-greeting reference external" href="https://github.com/jupyterhub/jupyterhub">JupyterHub</a>, a multi-user <strong>Hub</strong>, spawns, manages, and proxies multiple instances of the single-user <a class="reference external" href="https://jupyter-notebook.readthedocs.io/en/latest/">Jupyter Notebook</a>        server. JupyterHub can be used to serve notebooks to a class of students, a corporate data science group, or a scientific research group.
-	</p>
-</div>
-
 <div id="login-main" class="container">
 	<div class="service-login">
 		<a role="button" class='btn btn-jupyter btn-lg' href='{{ authenticator_login_url }}'>
