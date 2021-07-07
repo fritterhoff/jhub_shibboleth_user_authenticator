@@ -1,0 +1,52 @@
+{% extends "templates/page.html" %}
+
+{% block login_widget %}
+{% endblock %}
+
+{% block main %}
+<div id="logout-message" class="container text-center">
+	<p>
+		<h3>You are successfully logged out from the JupyterHub!</h3>
+	</p>
+</div>
+
+
+<div id="login-main" class="container">
+	<div class="service-login">
+		<a role="button" class='btn btn-jupyter btn-lg' href='/'>
+			Return to login page!
+		</a>
+	</div>
+</div>
+
+<div style="display:none">
+	<iframe src='{{ authenticator_logout_url }}'
+		title="SP Logout">
+		<!-- Alternate content for non-supporting browsers -->
+	</iframe>
+</div>
+
+<div class="login-footer container text-center footer">
+</div>
+{% endblock %}
+
+{% block stylesheet %}
+{{ super() }}
+<style>
+	#login-main {
+		height: 30vh;
+	}
+
+	#login-main form {
+		margin: 0px;
+	}
+
+	.login-greeting {
+		font-size: larger;
+	}
+
+	.login-footer {
+		font-size: larger;
+	}
+</style>
+{% endblock %}

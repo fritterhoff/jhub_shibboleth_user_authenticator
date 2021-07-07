@@ -2,7 +2,7 @@ from jupyterhub.handlers import BaseHandler
 from jupyterhub.handlers.login import LogoutHandler
 from jupyterhub.auth import Authenticator
 from tornado.httputil import url_concat
-from traitlets import Unicode, List
+from traitlets import Bool, Unicode, List
 
 
 class ShibbolethUserLoginHandler(BaseHandler):
@@ -59,7 +59,17 @@ class ShibbolethUserLogoutHandler(LogoutHandler):
     """Redirect to Shibboleth logout."""
     #async def handle_logout(self):
     async def render_logout_page(self):
-        self.redirect(self.authenticator.logout_page)
+        if self.authenticator.logout_redirect:
+            self.redirect(self.authenticator.logout_page)
+        else:
+            html = self.render_template(
+                'logout_shibboleth.html',
+                sync=True,
+                authenticator_logout_url=self.authenticator.logout_page
+            )
+
+            self.finish(html)
+
 
 
 class ShibbolethUserAuthenticator(Authenticator):
@@ -83,8 +93,15 @@ class ShibbolethUserAuthenticator(Authenticator):
 
     logout_page = Unicode(
         default_value='/Shibboleth.sso/Logout?return=/',
+        #default_value='/Shibboleth.sso/Logout',
         config=True,
         help='Location of logout page'
+    )
+
+    logout_redirect = Bool(
+        default_value=False,
+        config=True,
+        help='Redirect logout page via direct call'
     )
 
     login_service = Unicode(
