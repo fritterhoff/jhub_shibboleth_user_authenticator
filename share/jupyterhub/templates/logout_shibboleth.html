@@ -3,13 +3,25 @@
 {% block login_widget %}
 {% endblock %}
 
+{% block meta %}
+{% if automatic_redirect %}
+<meta http-equiv="refresh" content="5; URL=/">
+{% endif %}
+{% endblock %}
+
 {% block main %}
 <div id="logout-message" class="container text-center">
 	<p>
-		<h3>You are successfully logged out from the JupyterHub!</h3>
+		<h4>You are successfully logged out from the JupyterHub!</h4>
 	</p>
 </div>
-
+{% if automatic_redirect %}
+<div id="logout-message" class="container text-center">
+	<p>
+		<h4>You will automatically redirect in 5 seconds! Otherwise click the next button!</h4>
+	</p>
+</div>
+{% endif %}
 
 <div id="login-main" class="container">
 	<div class="service-login">

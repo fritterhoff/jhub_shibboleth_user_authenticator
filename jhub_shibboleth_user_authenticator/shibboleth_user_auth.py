@@ -65,6 +65,7 @@ class ShibbolethUserLogoutHandler(LogoutHandler):
             html = self.render_template(
                 'logout_shibboleth.html',
                 sync=True,
+                automatic_redirect=self.authenticator.automatic_redirect,
                 authenticator_logout_url=self.authenticator.logout_page
             )
 
@@ -93,15 +94,20 @@ class ShibbolethUserAuthenticator(Authenticator):
 
     logout_page = Unicode(
         default_value='/Shibboleth.sso/Logout?return=/',
-        #default_value='/Shibboleth.sso/Logout',
         config=True,
         help='Location of logout page'
     )
 
     logout_redirect = Bool(
-        default_value=False,
+        default_value=True,
         config=True,
         help='Redirect logout page via direct call'
+    )
+
+    automatic_redirect = Bool(
+        default_value=False,
+        config=True,
+        help='Automatically redirect to login page'
     )
 
     login_service = Unicode(
