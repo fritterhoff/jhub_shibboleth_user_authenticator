@@ -47,3 +47,17 @@ Usage with a simple jupyterhub configuration:
     # put some extra values in the auth_state for the spawner
     # don't forget to activate c.Authenticator.enable_auth_state = True
     c.Authenticator.auth_state_header_names = ['mail', 'givenname']
+
+
+During tests we found some Shibboleth IdPs which don't support Logout-redirections. So, the default:
+
+    # define logout page
+    c.Authenticator.logout_page = '/Shibboleth.sso/Logout?return=/'
+
+was not working. We add an alternative scheme, which is doing the logout process in a hidden iframe:
+
+    # activate the alternative logout scheme
+    c.Authenticator.logout_redirect = False      ä default is True
+
+    # add an automatic redirect to the login page (if you want)
+    c.Authenticator.automatic_redirect = True    # default is False
