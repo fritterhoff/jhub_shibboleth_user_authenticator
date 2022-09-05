@@ -12,6 +12,8 @@ class ShibbolethUserLoginHandler(BaseHandler):
         remote_user = self.request.headers.get(header_name, '')
 
         self.log.info("Shibboleth remote_user(%s)=%s", header_name, remote_user)
+        remote_user = remote_user.split("@")[0]
+        self.log.info("Stripped Shibboleth remote_user(%s)=%s", header_name, remote_user)
         if remote_user == '':
             self.login_page()
         else:
